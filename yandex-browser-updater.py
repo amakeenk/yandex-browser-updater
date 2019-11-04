@@ -3,9 +3,11 @@
 import requests
 from sys import argv
 from argparse import ArgumentParser
+from bs4 import BeautifulSoup
 from subprocess import Popen
 from subprocess import PIPE
-from bs4 import BeautifulSoup
+from tempfile import gettempdir
+from tqdm import tqdm
 
 repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
 
@@ -65,6 +67,22 @@ def check_install():
         exit(1)
 
 
+def download_rpm_package():
+    url = get_full_path_to_rpm()
+    output_file = '{}/{}'.format(gettempdir(), url.split('/')[-1])
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get('content-length', 0))
+    tqdm_bar = tqdm(total=total_size, unit='iB', unit_scale=True)
+    with open(output_file, "wb") as file:
+        for data in response.iter_content(1024):
+            tqdm_bar.update(len(data))
+            file.write(data)
+    tqdm_bar.close()
+    if total_size != 0 and tqdm_bar.n != total_size:
+        print("Some error occurred while download.")
+        exit(1)
+
+
 def main():
     check_install()
     current_version = get_current_version()
@@ -73,7 +91,10 @@ def main():
     last_version = get_last_version()
     print('Last version: {}'.format(last_version))
     if compare_versions(current_version, last_version):
-        pass
+        print('New version is available.')
+        print('Download rpm package ...')
+        download_rpm_package()
+        print('Install new version of Yandex Browser')
     else:
         print('The latest version is already installed.')
         exit(0)
