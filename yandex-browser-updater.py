@@ -42,17 +42,17 @@ def get_full_path_to_rpm():
 
 
 def get_last_version():
-    cmd = 'rpm --query --package --queryformat="%{VERSION}" ' + format(get_full_path_to_rpm())
+    cmd = 'rpm --query --package --queryformat="%{VERSION}" ' + get_full_path_to_rpm()
     return do_action(cmd)
 
 
-def get_local_version():
+def get_current_version():
     cmd = 'rpm --query --queryformat="%{VERSION}" yandex-browser-beta'
     return do_action(cmd)
 
 
 def main():
-    print('Current version: {}'.format(get_local_version()))
+    print('Current version: {}'.format(get_current_version()))
     print('Check last version ...')
     print('Last available version: {}'.format(get_last_version()))
 
