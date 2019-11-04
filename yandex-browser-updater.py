@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import requests
+from sys import argv
 from argparse import ArgumentParser
 from subprocess import Popen
 from subprocess import PIPE
@@ -19,7 +20,8 @@ def args_parser():
 def do_action(cmd):
     proc = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
     stdout, stderr = proc.communicate()
-    return stdout if not stderr else stderr
+    exit_code = proc.returncode
+    return [stdout, exit_code] if proc.returncode == 0 else [stderr, exit_code]
 
 
 def get_last_version_rpm_name():
@@ -43,18 +45,38 @@ def get_full_path_to_rpm():
 
 def get_last_version():
     cmd = 'rpm --query --package --queryformat="%{VERSION}" ' + get_full_path_to_rpm()
-    return do_action(cmd)
+    return do_action(cmd)[0]
 
 
 def get_current_version():
     cmd = 'rpm --query --queryformat="%{VERSION}" yandex-browser-beta'
-    return do_action(cmd)
+    return do_action(cmd)[0]
+
+
+def compare_versions(current_version, last_version):
+    return 1 if last_version != current_version else 0
+
+
+def check_install():
+    cmd = 'rpm -q yandex-browser-beta'
+    if do_action(cmd)[1] != 0:
+        print('Yandex Browser is not installed.')
+        print('For installation use {} --install'.format(argv[0]))
+        exit(1)
 
 
 def main():
-    print('Current version: {}'.format(get_current_version()))
+    check_install()
+    current_version = get_current_version()
+    print('Current version: {}'.format(current_version))
     print('Check last version ...')
-    print('Last available version: {}'.format(get_last_version()))
+    last_version = get_last_version()
+    print('Last version: {}'.format(last_version))
+    if compare_versions(current_version, last_version):
+        pass
+    else:
+        print('The latest version is already installed.')
+        exit(0)
 
 
 if __name__ == '__main__':
