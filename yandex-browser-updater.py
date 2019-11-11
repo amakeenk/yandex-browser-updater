@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+# Author: Alexander Makeenkov <amakeenk@altlinux.org>
+# License: MIT
+
 import requests
 from bs4 import BeautifulSoup
 from subprocess import Popen
@@ -11,6 +14,7 @@ from os import symlink
 
 
 class Updater():
+    """Class for updating of yandex-browser"""
     def __init__(self):
         self.repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
         self.package_dir = '/opt/yandex/browser-beta'
