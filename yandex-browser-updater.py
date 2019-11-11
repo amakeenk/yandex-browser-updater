@@ -6,11 +6,15 @@ from subprocess import Popen
 from subprocess import PIPE
 from tempfile import gettempdir
 from tqdm import tqdm
+from os import path
+from os import symlink
 
 
 class Updater():
-    def __init__(self, repo_url):
-        self.repo_url = repo_url
+    def __init__(self):
+        self.repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
+        self.package_dir = '/opt/yandex/browser-beta'
+        self.libffmpeg_path = '{}/lib/libffmpeg.so'.format(self.package_dir)
         self.current_version = ''
         self.last_version = ''
 
@@ -82,12 +86,21 @@ class Updater():
             print(result[0])
             exit(1)
         else:
-            pass
+            self.current_version = self.get_current_version()
+            if self.compare_versions():
+                print('New version is not installed.')
+                exit(1)
+            else:
+                print('New version successfully installed.')
+
+    def link_libffmpeg(self):
+        symlink_path = 'libffmpeg.so'.format(self.package_dir)
+        if path.isfile(self.libffmpeg_path) and not path.isfile(symlink_path):
+            symlink(self.libffmpeg_path, symlink_path)
 
     def run(self):
         if self.check_install():
             self.current_version = self.get_current_version()
-            self.current_version = ''
             print('Current version: {}'.format(self.current_version))
             print('Checking last version ...')
             self.last_version = self.get_last_version()
@@ -102,11 +115,11 @@ class Updater():
         else:
             rpm_file = self.download_rpm_package()
             self.install(rpm_file)
+        self.link_libffmpeg()
 
 
 def main():
-    repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
-    updater = Updater(repo_url)
+    updater = Updater()
     updater.run()
 
 
