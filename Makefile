@@ -1,4 +1,5 @@
 BINDIR ?= /usr/sbin
 
 install:
-	install -m0755 yandex-browser-updater.py $(BINDIR)/yandex-browser-updater
+	mkdir -p $(DESTDIR)$(BINDIR)
+	install -m0755 yandex-browser-updater.py $(DESTDIR)$(BINDIR)/yandex-browser-updater
