@@ -54,7 +54,7 @@ class Updater():
         return self.do_action(cmd)[0]
 
     def compare_versions(self):
-        return 1 if self.last_version != self.current_version else 0
+        return 1 if self.last_version == self.current_version else 0
 
     def check_install(self):
         cmd = 'rpm -q yandex-browser-beta'
@@ -88,43 +88,45 @@ class Updater():
         result = self.do_action(cmd)
         if result[1] != 0:
             print(result[0])
-            exit(1)
+            return 0
         else:
-            self.current_version = self.get_current_version()
-            if self.compare_versions():
-                print('New version is not installed.')
-                exit(1)
-            else:
-                print('New version successfully installed.')
+            return 1
 
     def link_libffmpeg(self):
-        symlink_path = 'libffmpeg.so'.format(self.package_dir)
+        symlink_path = '{}/libffmpeg.so'.format(self.package_dir)
         if path.isfile(self.libffmpeg_path) and not path.isfile(symlink_path):
             symlink(self.libffmpeg_path, symlink_path)
-
-    def run(self):
-        if self.check_install():
-            self.current_version = self.get_current_version()
-            print('Current version: {}'.format(self.current_version))
-            print('Checking last version ...')
-            self.last_version = self.get_last_version()
-            print('Last version: {}'.format(self.last_version))
-            if self.compare_versions():
-                print('New version is available.')
-                rpm_file = self.download_rpm_package()
-                self.install(rpm_file)
-            else:
-                print('The latest version is already installed.')
-                exit(0)
-        else:
-            rpm_file = self.download_rpm_package()
-            self.install(rpm_file)
-        self.link_libffmpeg()
 
 
 def main():
     updater = Updater()
-    updater.run()
+    if updater.check_install():
+        updater.current_version = updater.get_current_version()
+        print('Current version: {}'.format(updater.current_version))
+        print('Checking last version ...')
+        updater.last_version = updater.get_last_version()
+        print('Last version: {}'.format(updater.last_version))
+        if not updater.compare_versions():
+            print('New version is available.')
+            rpm_file = updater.download_rpm_package()
+            if updater.install(rpm_file):
+                updater.current_version = updater.get_current_version()
+                if not updater.compare_versions():
+                    print('New version is not installed.')
+                    exit(1)
+                else:
+                    print('New version successfully installed.')
+        else:
+            print('The latest version is already installed.')
+            exit(0)
+    else:
+        rpm_file = updater.download_rpm_package()
+        if not updater.install(rpm_file):
+            print('Yandex Browser is not installed.')
+            exit(1)
+        else:
+            print('Yandex Browser successfully installed.')
+    updater.link_libffmpeg()
 
 
 if __name__ == '__main__':
