@@ -11,6 +11,7 @@ from tempfile import gettempdir
 from tqdm import tqdm
 from os import path
 from os import symlink
+from os import remove
 
 
 class Updater():
@@ -18,7 +19,7 @@ class Updater():
     def __init__(self):
         self.repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
         self.package_dir = '/opt/yandex/browser-beta'
-        self.libffmpeg_path = '{}/lib/libffmpeg.so'.format(self.package_dir)
+        self.libffmpeg_qmmp1_path = '/usr/lib64/qmmp-1.3/Input/libffmpeg.so'
         self.current_version = ''
         self.last_version = ''
 
@@ -94,8 +95,15 @@ class Updater():
 
     def link_libffmpeg(self):
         symlink_path = '{}/libffmpeg.so'.format(self.package_dir)
-        if path.isfile(self.libffmpeg_path) and not path.isfile(symlink_path):
-            symlink(self.libffmpeg_path, symlink_path)
+        try:
+            if path.isfile(symlink_path):
+                remove(symlink_path)
+            if path.isfile(self.libffmpeg_qmmp1_path):
+                symlink(self.libffmpeg_qmmp1_path, symlink_path)
+            else:
+                print('ERROR: File {} not found.'.format(self.libffmpeg_qmmp1_path))
+        except OSError as error:
+            print(error)
 
 
 def main():
