@@ -12,6 +12,7 @@ from tqdm import tqdm
 from os import path
 from os import symlink
 from os import remove
+from platform import architecture
 
 
 class Updater():
@@ -105,9 +106,16 @@ class Updater():
         except OSError as error:
             print(error)
 
+    def check_arch(self):
+        cur_arch = architecture()[0]
+        if cur_arch != '64bit':
+            print('Yandex Browser is not supported on {} architecture!'.format(cur_arch))
+            exit(1)
+
 
 def main():
     updater = Updater()
+    updater.check_arch()
     if updater.check_install():
         updater.current_version = updater.get_current_version()
         print('Current version: {}'.format(updater.current_version))
