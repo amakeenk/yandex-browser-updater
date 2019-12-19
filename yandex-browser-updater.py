@@ -72,7 +72,7 @@ class Updater():
         output_file = '{}/{}'.format(gettempdir(), url.split('/')[-1])
         response = requests.get(url, stream=True)
         total_size = int(response.headers.get('content-length', 0))
-        tqdm_bar = tqdm(total=total_size, unit='iB', unit_scale=True)
+        tqdm_bar = tqdm(total=total_size, unit='iB', unit_scale=True, ascii="#")
         with open(output_file, "wb") as file:
             for data in response.iter_content(1024):
                 tqdm_bar.update(len(data))
