@@ -20,7 +20,6 @@ class Updater():
     def __init__(self):
         self.repo_url = 'https://repo.yandex.ru/yandex-browser/rpm/beta/x86_64'
         self.package_dir = '/opt/yandex/browser-beta'
-        self.libffmpeg_qmmp1_path = '/usr/lib64/qmmp-1.3/Input/libffmpeg.so'
         self.current_version = ''
         self.last_version = ''
 
@@ -96,15 +95,19 @@ class Updater():
 
     def link_libffmpeg(self):
         symlink_path = '{}/libffmpeg.so'.format(self.package_dir)
-        try:
-            if path.isfile(symlink_path):
-                remove(symlink_path)
-            if path.isfile(self.libffmpeg_qmmp1_path):
-                symlink(self.libffmpeg_qmmp1_path, symlink_path)
-            else:
-                print('ERROR: File {} not found.'.format(self.libffmpeg_qmmp1_path))
-        except OSError as error:
-            print(error)
+        if self.do_action('rpm -q qmmp1')[1] == 0:
+            libffmpeg_qmmp1_path = self.do_action('rpm -ql qmmp1 | grep libffmpeg.so')[0].replace('\n', '')
+            try:
+                if path.isfile(symlink_path):
+                    remove(symlink_path)
+                if path.isfile(libffmpeg_qmmp1_path):
+                    symlink(libffmpeg_qmmp1_path, symlink_path)
+                else:
+                    print('ERROR: File {} not found.'.format(libffmpeg_qmmp1_path))
+            except OSError as error:
+                print(error)
+        else:
+            print('Package qmmp1 not installed. Symlink for libffmpeg.so will not be created.')
 
     def check_arch(self):
         cur_arch = architecture()[0]
