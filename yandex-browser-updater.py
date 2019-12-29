@@ -102,6 +102,7 @@ class Updater():
                     remove(symlink_path)
                 if path.isfile(libffmpeg_qmmp1_path):
                     symlink(libffmpeg_qmmp1_path, symlink_path)
+                    self.remove_default_libffmpeg()
                 else:
                     print('ERROR: File {} not found.'.format(libffmpeg_qmmp1_path))
             except OSError as error:
@@ -114,6 +115,14 @@ class Updater():
         if cur_arch != '64bit':
             print('Yandex Browser is not supported on {} architecture!'.format(cur_arch))
             exit(1)
+
+    def remove_default_libffmpeg(self):
+        default_libffmpeg_path = '{}/lib/libffmpeg.so'.format(self.package_dir)
+        if path.isfile(default_libffmpeg_path):
+            try:
+                remove(default_libffmpeg_path)
+            except OSError as error:
+                print(error)
 
 
 def main():
