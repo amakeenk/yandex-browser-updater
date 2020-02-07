@@ -1,5 +1,5 @@
 Name: yandex-browser-updater
-Version: 1.3
+Version: 1.4
 Release: alt1
 Summary: Script for automation installing and updating yandex browser
 License: MIT
@@ -25,6 +25,9 @@ Requires: python3-module-tqdm
 %_sbindir/%name
 
 %changelog
+* Fri Feb 07 2020 Alexander Makeenkov <amakeenk@altlinux.org> 1.4-alt1
+- Version updated to 1.4
+
 * Sun Dec 29 2019 Alexander Makeenkov <amakeenk@altlinux.org> 1.3-alt1
 - Remove default libffmpeg
 
