@@ -11,7 +11,6 @@ Packager: Alexander Makeenkov <amakeenk@altlinux.org>
 BuildArch: noarch
 Requires: python3-module-BeautifulSoup4
 Requires: python3-module-tqdm
-Requires: qmmp1
 
 %description
 %summary.

@@ -9,9 +9,6 @@ from subprocess import Popen
 from subprocess import PIPE
 from tempfile import gettempdir
 from tqdm import tqdm
-from os import path
-from os import symlink
-from os import remove
 from platform import architecture
 
 
@@ -93,36 +90,11 @@ class Updater():
         else:
             return 1
 
-    def link_libffmpeg(self):
-        symlink_path = '{}/libffmpeg.so'.format(self.package_dir)
-        if self.do_action('rpm -q qmmp1')[1] == 0:
-            libffmpeg_qmmp1_path = self.do_action('rpm -ql qmmp1 | grep libffmpeg.so')[0].replace('\n', '')
-            try:
-                if path.isfile(symlink_path):
-                    remove(symlink_path)
-                if path.isfile(libffmpeg_qmmp1_path):
-                    symlink(libffmpeg_qmmp1_path, symlink_path)
-                    self.remove_default_libffmpeg()
-                else:
-                    print('ERROR: File {} not found.'.format(libffmpeg_qmmp1_path))
-            except OSError as error:
-                print(error)
-        else:
-            print('Package qmmp1 not installed. Symlink for libffmpeg.so will not be created.')
-
     def check_arch(self):
         cur_arch = architecture()[0]
         if cur_arch != '64bit':
             print('Yandex Browser is not supported on {} architecture!'.format(cur_arch))
             exit(1)
-
-    def remove_default_libffmpeg(self):
-        default_libffmpeg_path = '{}/lib/libffmpeg.so'.format(self.package_dir)
-        if path.isfile(default_libffmpeg_path):
-            try:
-                remove(default_libffmpeg_path)
-            except OSError as error:
-                print(error)
 
 
 def main():
@@ -154,7 +126,6 @@ def main():
             exit(1)
         else:
             print('Yandex Browser successfully installed.')
-    updater.link_libffmpeg()
 
 
 if __name__ == '__main__':
