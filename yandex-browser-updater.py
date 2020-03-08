@@ -44,8 +44,7 @@ class Updater():
         return '{}/{}'.format(self.repo_url, rpm_name)
 
     def get_last_version(self):
-        cmd = 'rpm --query --package --queryformat="%{VERSION}" ' + self.get_full_path_to_rpm()
-        return self.do_action(cmd)[0]
+        return self.get_full_path_to_rpm().split('-')[4]
 
     def get_current_version(self):
         cmd = 'rpm --query --queryformat="%{VERSION}" yandex-browser-beta'
