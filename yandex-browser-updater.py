@@ -107,14 +107,17 @@ def main():
         print('Last version: {}'.format(updater.last_version))
         if not updater.compare_versions():
             print('New version is available.')
-            rpm_file = updater.download_rpm_package()
-            if updater.install(rpm_file):
-                updater.current_version = updater.get_current_version()
-                if not updater.compare_versions():
-                    print('New version is not installed.')
-                    exit(1)
-                else:
-                    print('New version successfully installed.')
+            if input('Install new version? (y/n): ') == 'y':
+                rpm_file = updater.download_rpm_package()
+                if updater.install(rpm_file):
+                    updater.current_version = updater.get_current_version()
+                    if not updater.compare_versions():
+                        print('New version is not installed.')
+                        exit(1)
+                    else:
+                        print('New version successfully installed.')
+            else:
+                exit(0)
         else:
             print('The latest version is already installed.')
             exit(0)
